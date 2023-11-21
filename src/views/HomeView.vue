@@ -1,8 +1,10 @@
 <script setup>
+import Timelime from '../components/Timelime.vue';
+
 </script>
 
 <template>
   <main>
-    oi
+    <Timelime />
   </main>
 </template>
