@@ -1,8 +1,7 @@
 <template>
   <Container>
     <div class="profile-container">
-      <a-typography-title :level="2"> Profile {{ route.params.username }}</a-typography-title>
-      <a-typography-title :level="3"> Image Galery</a-typography-title>
+      <UserBar username="Ederusena" :userInfo="{posts: 4, followers: 100, following: 344}"/>
     </div>
   </Container>
 </template>
@@ -10,7 +9,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import Container from "./Container.vue";
-
+import UserBar from "./UserBar.vue";
 const route = useRoute();
 
 </script>
@@ -19,7 +18,6 @@ const route = useRoute();
 .profile-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
   padding: 2rem 0;
 }
 </style>
