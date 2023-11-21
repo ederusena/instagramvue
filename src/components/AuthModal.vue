@@ -7,13 +7,14 @@
         <a-button
           key="submit"
           type="primary"
+          :disabled="loading"
           :loading="loading"
           @click="handleOk"
           >Submit</a-button
         >
       </template>
-      <div class="input-container">
-        <a-input
+      <div v-if="!loading" class="input-container">
+          <a-input
           v-if="!isLogin"
           v-model:value="userCredentials.username"
           placeholder="Username"
@@ -30,10 +31,13 @@
           type="password"
           class="input"
         />
-        <a-typography-title v-if="errorMessage" type="danger" :level="5">{{
+      </div>
+      <div v-else class="spinner">
+        <a-spin size="large" />
+      </div>
+      <a-typography-title v-if="errorMessage" type="danger" :level="5">{{
           errorMessage
         }}</a-typography-title>
-      </div>
     </a-modal>
   </div>
 </template>
@@ -53,21 +57,37 @@ const open = ref(false);
 const { isLogin } = defineProps(["isLogin"]);
 const title = isLogin ? "Login" : "Signup";
 const userStore = useUsersStore();
-const { errorMessage } = storeToRefs(userStore);
+const { errorMessage, loading, user } = storeToRefs(userStore);
 
 const showModal = () => {
   open.value = true;
 };
 
-const handleOk = (e) => {
-  console.log("ok");
-  userStore.handleSignup(userCredentials);
+const handleOk = async (e) => {
+  if (isLogin) {
+    await userStore.handleLogin(userCredentials);
+  } else {
+    await userStore.handleSignup(userCredentials);
+  }
+
+  if (user.value) {
+    open.value = false;
+    clearCredentials();
+    userStore.clearMessageError();
+  }
 };
 
 const handleCancel = (e) => {
-  userStore.clearMessageError();
   open.value = false;
+  userStore.clearMessageError();
 };
+
+const clearCredentials = () => {
+  userCredentials.username = "";
+  userCredentials.email = "";
+  userCredentials.password = "";
+};
+
 </script>
 
 <style scoped>
@@ -75,5 +95,11 @@ const handleCancel = (e) => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120px;
 }
 </style>
