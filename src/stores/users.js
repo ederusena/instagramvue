@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import { supabase } from "../supabase";
 
 export const useUsersStore = defineStore("users", () => {
   const user = ref(null);
@@ -8,26 +9,22 @@ export const useUsersStore = defineStore("users", () => {
 
   const handleLogin = () => {};
 
-  const handleSignup = (credentials) => {
+  const handleSignup = async (credentials) => {
     const { email, password, username } = credentials;
 
-
     if (username.length < 4) {
-      console.log("Username must be at least 3 characters");
       const errorMessageValue = "Username must be at least 3 characters";
       errorMessage.value = errorMessageValue;
       return errorMessage.value;
     }
 
     if (!emailRegex.test(email)) {
-      console.log("Please enter a valid email");
       const errorMessageValue = "Please enter a valid email";
       errorMessage.value = errorMessageValue;
       return errorMessage.value;
     }
 
     if (password.length < 8) {
-      console.log("Password must be at least 8 characters");
       const errorMessageValue = "Password must be at least 8 characters";
       errorMessage.value = errorMessageValue;
       return errorMessage.value;
@@ -35,11 +32,43 @@ export const useUsersStore = defineStore("users", () => {
 
     errorMessage.value = "";
 
+    const { data: userWithUsernameAlreaedyExists } = await supabase
+      .from("users")
+      .select("*")
+      .eq("username", username)
+      .single();
+
+    if (userWithUsernameAlreaedyExists) {
+      errorMessage.value = "Username already exists";
+      return errorMessage.value;
+    }
+
+    errorMessage.value = "";
+
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      errorMessage.value = error.message;
+      return errorMessage.value;
+    }
+
+    await supabase.from("users").insert([{ username, email }]);
   };
 
   const handleLogout = () => {};
 
   const getUser = () => {};
 
-  return { user, errorMessage, handleLogin, handleSignup, handleLogout, getUser };
+  const clearMessageError = () => {
+    errorMessage.value = "";
+  };
+
+  return {
+    user,
+    errorMessage,
+    clearMessageError,
+    handleLogin,
+    handleSignup,
+    handleLogout,
+    getUser,
+  };
 });
