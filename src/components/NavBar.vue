@@ -43,7 +43,7 @@
 
 <script setup>
 import AuthModal from "./AuthModal.vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import Container from "./Container.vue";
 import { ref } from "vue";
 
@@ -54,8 +54,12 @@ const password = ref("");
 const searchUsername = ref("");
 const isAuthenicated = ref(true);
 
+const router = useRouter();
 const onSearch = () => {
-  console.log(searchUsername.value);
+  if(searchUsername.value) {
+    router.push({ name: "profile", params: { username: searchUsername.value } });
+    searchUsername.value = "";
+  }
 };
 </script>
 
