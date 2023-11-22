@@ -7,6 +7,7 @@ export const useUsersStore = defineStore("users", () => {
   const errorMessage = ref("");
   const loading = ref(false);
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const loadingUser = ref(false);
 
   const handleLogin = async (credentials) => {
     const { email, password } = credentials;
@@ -121,14 +122,15 @@ export const useUsersStore = defineStore("users", () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    user.value = null;
   };
 
   const getUser = async () => {
-    loading.value = true;
+    loadingUser.value = true;
     const { data } = await supabase.auth.getUser();
 
     if (!data.user) {
-      loading.value = false;
+      loadingUser.value = false;
       user.value = null;
       return;
     }
@@ -145,7 +147,7 @@ export const useUsersStore = defineStore("users", () => {
       email: userWithEmail.email,
     };
 
-    loading.value = false;
+    loadingUser.value = false;
   };
 
   const clearMessageError = () => {
@@ -156,6 +158,7 @@ export const useUsersStore = defineStore("users", () => {
     user,
     loading,
     errorMessage,
+    loadingUser,
     clearMessageError,
     handleLogin,
     handleSignup,

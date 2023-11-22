@@ -11,14 +11,16 @@
             @search="onSearch"
           />
         </div>
-        <div class="left-content" v-if="!isAuthenticated">
-          <AuthModal :isLogin="true" />
-          <AuthModal :isLogin="false" />
-        </div>
+        <div class="content" v-if="!loadingUser">
+          <div class="left-content" v-if="!user">
+            <AuthModal :isLogin="true" />
+            <AuthModal :isLogin="false" />
+          </div>
 
-        <div class="left-content" v-else>
-          <a-button type="primary" @click="handleOk">Logout</a-button>
-          <a-button type="primary" @click="handleOk">Profile</a-button>
+          <div class="left-content" v-else>
+            <a-button type="primary" @click="userStore.handleLogout">Logout</a-button>
+            <a-button type="primary" @click="handleOk">Profile</a-button>
+          </div>
         </div>
       </div>
     </Container>
@@ -26,10 +28,15 @@
 </template>
 
 <script setup>
-import AuthModal from "./AuthModal.vue";
 import { RouterLink, useRouter } from "vue-router";
+import { useUsersStore } from "@/stores/users";
+import AuthModal from "./AuthModal.vue";
 import Container from "./Container.vue";
+import { storeToRefs } from "pinia";
 import { ref } from "vue";
+
+const userStore = useUsersStore();
+const { user, loadingUser } = storeToRefs(userStore);
 
 const searchUsername = ref("");
 const isAuthenticated = ref(false);
@@ -47,6 +54,11 @@ const onSearch = () => {
 </script>
 
 <style scoped>
+.content {
+  display: flex;
+  align-items: center;
+
+}
 .nav-container {
   display: flex;
   justify-content: space-between;
@@ -64,6 +76,4 @@ const onSearch = () => {
   align-items: center;
   gap: 10px;
 }
-
-
 </style>

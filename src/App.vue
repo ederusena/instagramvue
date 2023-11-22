@@ -1,9 +1,9 @@
 <script setup>
 import { useUsersStore } from "@/stores/users";
-import { onMounted } from "vue";
-import { RouterView } from "vue-router";
 import NavBar from "./components/NavBar.vue";
+import { RouterView } from "vue-router";
 import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 
 const userStore = useUsersStore();
 const { user } = storeToRefs(userStore);
